@@ -3,7 +3,10 @@ from sqlalchemy.ext.asyncio import (async_sessionmaker, create_async_engine,
 from core.config import settings
 from asyncio import current_task
 #from fastapi_users.db import SQLAlchemyBaseUserTable
-from .models import Base
+from .models import Base, User
+from fastapi import Depends
+from fastapi_users.db import SQLAlchemyUserDatabase
+from sqlalchemy.ext.asyncio import AsyncSession
 
 class DatabaseHelper:
     def __init__(self, url: str, echo: bool = False) -> None:
@@ -37,3 +40,7 @@ async def create_tables():
 async def drop_tables():
     async with db_helper.engine.begin() as conn:
         await conn.run_sync(Base.metadata.drop_all)
+        
+async def get_user_db(session: AsyncSession = Depends(db_helper.session_dependency)):
+    yield SQLAlchemyUserDatabase(session, User)
+    
