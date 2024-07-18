@@ -22,5 +22,5 @@ class ReferallCode(Base):
     created_date: Mapped[datetime]
     expiration_date: Mapped[datetime]
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
-    user: Mapped["User"] = relationship(back_populates="referral_codes")
+    user: Mapped["User"] = relationship(back_populates="referral_codes", uselist=False)
     

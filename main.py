@@ -2,13 +2,14 @@ from fastapi import Depends, FastAPI
 from contextlib import asynccontextmanager
 from db.db_helper import create_tables, drop_tables
 from referral_codes.router import router as refcodes_router
+from users.router import router as users_router
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     yield
 
 app = FastAPI(lifespan=lifespan, title="Referral Codes API", )
 app.include_router(refcodes_router)
-
+app.include_router(users_router)
 # Using FastAPI instance
 @app.get("/")
 def get_all_urls():
