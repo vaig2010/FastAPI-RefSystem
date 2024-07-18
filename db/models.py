@@ -1,4 +1,5 @@
-from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+from sqlalchemy import ForeignKey
+from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from datetime import datetime
 
 class Base(DeclarativeBase):
@@ -7,11 +8,19 @@ class Base(DeclarativeBase):
 
 # class UserOrm(SQLAlchemyBaseUserTable[int], Base):
 #     pass
+
+class User(Base):
+    __tablename__ = "users"
+    username: Mapped[str] = mapped_column(unique=True)
+    email: Mapped[str] = mapped_column(unique=True)
+    password: Mapped[str]
+    referral_codes: Mapped[list["ReferallCode"]] = relationship(back_populates="user")
     
-class ReferallCodeOrm(Base):
+class ReferallCode(Base):
     __tablename__ = "referral_codes"
-    id: Mapped[int] = mapped_column(primary_key=True)
-    code: Mapped[str]
+    code: Mapped[str] = mapped_column(unique=True)
     created_date: Mapped[datetime]
     expiration_date: Mapped[datetime]
-    user_id: Mapped[int]
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    user: Mapped["User"] = relationship(back_populates="referral_codes")
+    
