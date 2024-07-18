@@ -16,3 +16,9 @@ class ReferralCode(ReferralCodeBase):
 class ReferralCodeId(BaseModel):
     ok: bool = True
     code_id: int
+    
+class ReferralCodeUpdatePartial(BaseModel):
+    code: str | None = None
+    created_date: datetime | None = None
+    expiration_date: datetime | None = None
+    user_id: int | None = None
