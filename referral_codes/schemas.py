@@ -3,13 +3,13 @@ from datetime import datetime
 from pydantic import BaseModel, ConfigDict
 
 
-class ReferralCodeAdd(BaseModel):
+class ReferralCodeBase(BaseModel):
     code: str
     created_date: datetime
     expiration_date: datetime 
     user_id: int
     
-class ReferralCode(ReferralCodeAdd):
+class ReferralCode(ReferralCodeBase):
     id: int
     model_config = ConfigDict(from_attributes=True)
     
