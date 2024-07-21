@@ -24,6 +24,8 @@ class User(SQLAlchemyBaseUserTable[int], Base):
         Boolean, default=False, nullable=False
     )
     code_id: Mapped[int] = mapped_column(nullable=True, default=None, index=True)
+    referrer_id: Mapped[int] = mapped_column(Integer, ForeignKey('users.id'), nullable=True)
+    referral_code: Mapped["ReferallCode"] = relationship("ReferallCode", back_populates="user", uselist=False)
     
 class ReferallCode(Base):
     __tablename__ = "referral_codes"
@@ -31,5 +33,5 @@ class ReferallCode(Base):
     created_date: Mapped[datetime]
     expiration_date: Mapped[datetime]
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), unique=True)
-    #user: Mapped["User"] = relationship(back_populates="referral_codes", uselist=False)
+    user: Mapped["User"] = relationship("User", back_populates="referral_code", uselist=False)
     

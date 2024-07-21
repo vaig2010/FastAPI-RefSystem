@@ -9,6 +9,7 @@ class UserRead(schemas.BaseUser[int]):
     is_superuser: bool = False
     is_verified: bool = False
     code_id: Optional[int] | None = None
+    referrer_id: Optional[int] | None = None
 
 
 class UserCreate(schemas.BaseUserCreate):
@@ -18,6 +19,7 @@ class UserCreate(schemas.BaseUserCreate):
     is_superuser: Optional[bool] = False
     is_verified: Optional[bool] = False
     code_id: Optional[int] | None = None
+    referrer_id: Optional[int] | None = None
 
 
 class UserUpdate(schemas.BaseUserUpdate):
@@ -27,3 +29,4 @@ class UserUpdate(schemas.BaseUserUpdate):
     is_superuser: Optional[bool] = False
     is_verified: Optional[bool] = False
     code_id: Optional[int] | None = None
+    referrer_id: Optional[int] | None = None

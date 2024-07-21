@@ -1,13 +1,11 @@
-from fastapi import Depends, FastAPI
-from fastapi_users import FastAPIUsers
+from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from auth.manager import get_user_manager
 from referral_codes.router import router as refcodes_router
 from users.router import router as users_router
+from referrals.router import router as referrals_router
 from auth.auth import auth_backend
 from auth.schemas import UserRead, UserCreate, UserUpdate
 from auth.fastapi_users import fastapi_users
-from db.models import User
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -18,6 +16,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(lifespan=lifespan, title="Referral Codes API", )
 app.include_router(refcodes_router)
 app.include_router(users_router)
+app.include_router(referrals_router)
 app.include_router(
     fastapi_users.get_auth_router(auth_backend),
     prefix="/auth/jwt",
