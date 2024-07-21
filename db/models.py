@@ -13,9 +13,6 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     email: Mapped[str] = mapped_column(
         String(length=320), unique=True, index=True, nullable=False
     )
-    username: Mapped[str] = mapped_column(
-        String(length=320), unique=True, index=True, nullable=False
-    )
     hashed_password: Mapped[str] = mapped_column(
         String(length=1024), nullable=False
     )
@@ -26,23 +23,13 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     is_verified: Mapped[bool] = mapped_column(
         Boolean, default=False, nullable=False
     )
-    code_id: Mapped[int] = mapped_column(nullable=True)
-
-
-# class User(Base):
-#     __tablename__ = "users"
-#     username: Mapped[str] = mapped_column(unique=True)
-#     email: Mapped[str] = mapped_column(unique=True)
-#     password: Mapped[str]
-#     referral_codes: Mapped[list["ReferallCode"]] = relationship(back_populates="user")
-    
-    
+    code_id: Mapped[int] = mapped_column(nullable=True, default=None, index=True)
     
 class ReferallCode(Base):
     __tablename__ = "referral_codes"
     code: Mapped[str] = mapped_column(unique=True)
     created_date: Mapped[datetime]
     expiration_date: Mapped[datetime]
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"))
+    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), unique=True)
     #user: Mapped["User"] = relationship(back_populates="referral_codes", uselist=False)
     
