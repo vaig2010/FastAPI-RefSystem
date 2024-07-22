@@ -7,13 +7,16 @@ from auth.auth import auth_backend
 from auth.schemas import UserRead, UserCreate, UserUpdate
 from auth.fastapi_users import fastapi_users
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     yield
 
 
-
-app = FastAPI(lifespan=lifespan, title="Referral Codes API", )
+app = FastAPI(
+    lifespan=lifespan,
+    title="Referral Codes API",
+)
 app.include_router(refcodes_router)
 app.include_router(users_router)
 app.include_router(referrals_router)
@@ -35,11 +38,14 @@ app.include_router(
     tags=["Users"],
 )
 
+
 @app.get("/")
 def get_all_urls():
     url_list = [{"path": route.path, "name": route.name} for route in app.routes]
     return url_list
 
+
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run("main:app", reload=True)

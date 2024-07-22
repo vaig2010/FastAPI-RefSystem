@@ -1,4 +1,3 @@
-
 from fastapi_users import FastAPIUsers
 
 from auth.manager import get_user_manager

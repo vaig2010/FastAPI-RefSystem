@@ -2,6 +2,7 @@ from typing import Optional
 from fastapi_users import schemas, models
 from pydantic import EmailStr
 
+
 class UserRead(schemas.BaseUser[int]):
     id: models.ID
     email: EmailStr
