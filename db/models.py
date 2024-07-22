@@ -34,4 +34,5 @@ class ReferallCode(Base):
     expiration_date: Mapped[datetime]
     user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), unique=True)
     user: Mapped["User"] = relationship("User", back_populates="referral_code", uselist=False)
+    # TODO: fix relationships not working
     

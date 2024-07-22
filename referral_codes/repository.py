@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
 from sqlalchemy import select, delete
-from db.models import ReferallCode
+from db.models import User, ReferallCode
 from sqlalchemy.ext.asyncio import AsyncSession
 from referral_codes.schemas import ReferralCodeBase, ReferralCodeUpdatePartial
 from sqlalchemy.exc import IntegrityError
@@ -73,4 +73,15 @@ class RefCodeRepository:
             await session.rollback()
             raise ValueError("Referral code for this user already exists.")
         return code
+    
+    @classmethod
+    async def get_code_by_email(cls, session: AsyncSession, email: str) -> ReferallCode:
+        query = (
+            select(ReferallCode)
+            .join(User, User.id == ReferallCode.user_id)
+            .filter(User.email == email)
+        )
+        result = await session.execute(query)
+        code_model = result.scalars().first()
+        return code_model
             

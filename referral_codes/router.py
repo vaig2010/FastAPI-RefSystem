@@ -1,11 +1,11 @@
 from typing import Annotated
-from fastapi import APIRouter, Depends, Path
+from fastapi import APIRouter, Depends, Path, HTTPException
 from db.db_helper import db_helper
 from referral_codes.repository import RefCodeRepository
 from referral_codes.schemas import ReferralCode, ReferralCodeBase, ReferralCodeId, ReferralCodeUpdatePartial
 from sqlalchemy.ext.asyncio import AsyncSession
 from .dependencies import refcode_by_id
-
+from pydantic import EmailStr
 router = APIRouter(prefix="/refcodes", tags=["Referral Codes"])
 
 @router.post("/")
@@ -50,3 +50,14 @@ async def delete_code_by_id(code: ReferralCode = Depends(refcode_by_id),
                             session: AsyncSession = Depends(db_helper.session_dependency), 
                             ) -> None:
     await RefCodeRepository.delete_code(session=session, code=code)
+
+@router.post("/by_email/")
+async def get_code_by_id(session: AsyncSession = Depends(db_helper.session_dependency),
+                        email: str | Annotated[EmailStr, Path()] = "user@example.com",
+                        ):
+    
+    code_model = await RefCodeRepository.get_code_by_email(session=session, email=email)
+    if not code_model:
+        raise HTTPException(status_code=404, detail="Referral code not found for this email")
+    return {"refcode": code_model}
+    
