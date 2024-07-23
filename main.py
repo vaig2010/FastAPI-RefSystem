@@ -4,9 +4,9 @@ from referral_codes.router import router as refcodes_router
 from users.router import router as users_router
 from referrals.router import router as referrals_router
 from auth.auth import auth_backend
-from auth.schemas import UserRead, UserCreate, UserUpdate
+from db.schemas import UserRead, UserCreate, UserUpdate
 from auth.fastapi_users import fastapi_users
-
+# TODO: add tests
 
 @asynccontextmanager
 async def lifespan(app: FastAPI):
@@ -31,7 +31,7 @@ app.include_router(
     prefix="/auth",
     tags=["Auth"],
 )
-
+# TODO: add referrer extended info
 app.include_router(
     fastapi_users.get_users_router(UserRead, UserUpdate),
     prefix="/users",

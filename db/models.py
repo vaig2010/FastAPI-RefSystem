@@ -1,5 +1,5 @@
 from fastapi_users.db import SQLAlchemyBaseUserTable
-from sqlalchemy import Boolean, Column, ForeignKey, Integer, String
+from sqlalchemy import Boolean, ForeignKey, Integer, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from datetime import datetime
 
@@ -22,9 +22,7 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     referrer_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("users.id"), nullable=True
     )
-    referral_code: Mapped["ReferallCode"] = relationship(
-        "ReferallCode", back_populates="user", uselist=False
-    )
+    referral_code: Mapped["ReferallCode"] = relationship("ReferallCode", back_populates="user", uselist=False)
 
 
 class ReferallCode(Base):
@@ -32,8 +30,8 @@ class ReferallCode(Base):
     code: Mapped[str] = mapped_column(unique=True)
     created_date: Mapped[datetime]
     expiration_date: Mapped[datetime]
-    user_id: Mapped[int] = mapped_column(ForeignKey("users.id"), unique=True)
-    user: Mapped["User"] = relationship(
-        "User", back_populates="referral_code", uselist=False
+    user_id: Mapped[int] = mapped_column(
+        ForeignKey("users.id"), unique=True, nullable=False
     )
-    # TODO: fix relationships not working
+    user: Mapped["User"] = relationship("User", back_populates="referral_code", overlaps="referral_code")
+

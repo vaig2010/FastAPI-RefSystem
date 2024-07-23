@@ -2,7 +2,7 @@ from typing import Annotated
 from fastapi import APIRouter, Depends, Path, HTTPException
 from db.db_helper import db_helper
 from referral_codes.repository import RefCodeRepository
-from referral_codes.schemas import (
+from db.schemas import (
     ReferralCode,
     ReferralCodeBase,
     ReferralCodeId,

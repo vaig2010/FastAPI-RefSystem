@@ -1,8 +1,8 @@
 from sqlalchemy import select, delete, update
 from db.models import User, ReferallCode
 from sqlalchemy.ext.asyncio import AsyncSession
-from referral_codes.schemas import ReferralCodeBase
-
+from db.schemas import ReferralCodeBase
+from sqlalchemy.orm import selectinload, joinedload
 
 class UserRepository:
     @classmethod
@@ -16,7 +16,7 @@ class UserRepository:
     async def get_user_refcode(
         cls, session: AsyncSession, user_id: int
     ) -> ReferallCode:
-        query = select(ReferallCode).where(User.id == user_id)
+        query = select(ReferallCode).options(selectinload(ReferallCode.user)).filter(ReferallCode.user_id == user_id)
         result = await session.execute(query)
         code_model = result.scalars().first()
         return code_model
@@ -25,5 +25,7 @@ class UserRepository:
     async def update_users_code_id(
         cls, session: AsyncSession, user: User, refcode: ReferallCode
     ) -> User:
-        user.code_id = refcode.id
+        query = update(User).where(User.id == user.id).values(code_id=refcode.id)
+        await session.execute(query)
+        await session.commit()
         return user

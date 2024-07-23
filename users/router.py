@@ -5,7 +5,7 @@ from users.repository import UserRepository
 from referral_codes.repository import RefCodeRepository
 from sqlalchemy.ext.asyncio import AsyncSession
 from db.db_helper import db_helper
-from referral_codes.schemas import ReferralCode
+from db.schemas import ReferralCode, UserRead
 
 router = APIRouter(prefix="/my_refcode", tags=["User Referral Code"])
 
@@ -13,11 +13,12 @@ router = APIRouter(prefix="/my_refcode", tags=["User Referral Code"])
 @router.get("/")
 async def get_user_refcode(
     session: AsyncSession = Depends(db_helper.session_dependency),
-    user: User = Depends(current_user),
-):
+    user: UserRead = Depends(current_user),
+) -> ReferralCode:
     code = await UserRepository.get_user_refcode(session=session, user_id=user.id)
-    code_schema = ReferralCode.model_validate(code)
-    return {"refcode": code_schema}
+    if not code:
+        raise HTTPException(status_code=404, detail="Referral code not found")
+    return code
 
 
 @router.post("/")

@@ -2,9 +2,9 @@ from datetime import datetime, timedelta
 from sqlalchemy import select, delete
 from db.models import User, ReferallCode
 from sqlalchemy.ext.asyncio import AsyncSession
-from referral_codes.schemas import ReferralCodeBase, ReferralCodeUpdatePartial
+from db.schemas import ReferralCodeBase, ReferralCodeUpdatePartial
 from sqlalchemy.exc import IntegrityError
-
+from sqlalchemy.orm import selectinload, joinedload
 
 class RefCodeRepository:
     def generate_referral_code():
@@ -34,7 +34,7 @@ class RefCodeRepository:
         cls,
         session: AsyncSession,
     ) -> list[ReferallCode]:
-        query = select(ReferallCode)
+        query = select(ReferallCode).options(selectinload(ReferallCode.user))
         result = await session.execute(query)
         code_models = result.scalars().all()
         # code_schemas = [ReferralCode.model_validate(model) for model in code_models]
@@ -42,7 +42,7 @@ class RefCodeRepository:
 
     @classmethod
     async def get_code(cls, session: AsyncSession, code_id: int) -> ReferallCode:
-        return await session.get(ReferallCode, code_id)
+        return await session.get(ReferallCode, code_id, options=[joinedload(ReferallCode.user)])
 
     @classmethod
     async def update_code(
@@ -92,3 +92,11 @@ class RefCodeRepository:
         result = await session.execute(query)
         code_model = result.scalars().first()
         return code_model
+    @classmethod
+    async def get_user_id_by_refcode(cls, session: AsyncSession, code: str) -> int:
+        query = select(ReferallCode.user_id).where(ReferallCode.code == code)
+        result = await session.execute(query)
+        user_id = result.scalars().first()
+        if not user_id:
+            raise ValueError("Referral code not found")
+        return user_id
