@@ -36,16 +36,17 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
             else user_create.create_update_dict_superuser()
         )
         password = user_dict.pop("password")
-        referral_code = user_dict.pop("referral_code")
-        try:
-            session = db_helper.get_scoped_session()
-            referrer_id = await RefCodeRepository.get_user_id_by_refcode(
-                session=session, code=referral_code
-            )
-            user_dict["referrer_id"] = referrer_id
-            await session.aclose()
-        except ValueError:
-            raise HTTPException(status_code=404, detail="Referral code not found")
+        if "referral_code" in user_dict:
+            referral_code = user_dict.pop("referral_code")
+            try:
+                session = db_helper.get_scoped_session()
+                referrer_id = await RefCodeRepository.get_user_id_by_refcode(
+                    session=session, code=referral_code
+                )
+                user_dict["referrer_id"] = referrer_id
+                await session.aclose()
+            except ValueError as e:
+                raise HTTPException(status_code=400, detail=str(e))
         user_dict["hashed_password"] = self.password_helper.hash(password)
 
         created_user = await self.user_db.create(user_dict)

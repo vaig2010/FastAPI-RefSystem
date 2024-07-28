@@ -77,7 +77,7 @@ async def delete_code_by_id(
 
 
 @router.post("/by_email/")
-async def get_code_by_id(
+async def get_code_by_email(
     session: AsyncSession = Depends(db_helper.session_dependency),
     email: str | Annotated[EmailStr, Path()] = "user@example.com",
 ):

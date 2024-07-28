@@ -94,9 +94,11 @@ class RefCodeRepository:
         return code_model
     @classmethod
     async def get_user_id_by_refcode(cls, session: AsyncSession, code: str) -> int:
-        query = select(ReferallCode.user_id).where(ReferallCode.code == code)
+        query = select(ReferallCode).where(ReferallCode.code == code)
         result = await session.execute(query)
-        user_id = result.scalars().first()
-        if not user_id:
+        ref_code: ReferallCode = result.scalars().first()
+        if ref_code is None:
             raise ValueError("Referral code not found")
-        return user_id
+        elif ref_code.expiration_date < datetime.now():
+            raise ValueError("Referral code expired")
+        return ref_code.user_id
