@@ -1,15 +1,21 @@
-from datetime import datetime
-from pydantic import BaseModel, ConfigDict, EmailStr
+from datetime import datetime, timezone
+from datetime import timedelta
+from pydantic import BaseModel, ConfigDict, EmailStr, Field, ValidationError
 from typing import Optional
 from fastapi_users import schemas, models
-
+from core.config import settings
 
 
 class ReferralCodeBase(BaseModel):
     code: str
-    created_date: datetime
-    expiration_date: datetime
+    created_date: datetime = Field(
+        default_factory=settings.time_func.datetime_now
+        )
+    expiration_date: datetime = Field(
+        default_factory=settings.time_func.datetime_expiration
+    )
     user_id: int
+
 
 class ReferralCode(ReferralCodeBase):
     id: int
@@ -28,6 +34,7 @@ class ReferralCodeUpdatePartial(BaseModel):
     expiration_date: datetime | None = None
     user_id: int | None = None
 
+
 class UserRead(schemas.BaseUser[int]):
     id: models.ID
     email: EmailStr
@@ -36,7 +43,7 @@ class UserRead(schemas.BaseUser[int]):
     is_verified: bool = False
     code_id: Optional[int] = None
     referrer_id: Optional[int] = None
-    #referral_code: Optional[ReferralCode] = None
+    # referral_code: Optional[ReferralCode] = None
 
 
 class UserCreate(schemas.BaseUserCreate):
@@ -58,4 +65,3 @@ class UserUpdate(schemas.BaseUserUpdate):
     is_verified: Optional[bool] = False
     code_id: Optional[int] = None
     referrer_id: Optional[int] = None
-

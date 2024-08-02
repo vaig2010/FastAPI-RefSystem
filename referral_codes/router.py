@@ -17,8 +17,8 @@ router = APIRouter(prefix="/refcodes", tags=["Referral Codes"])
 
 @router.post("/")
 async def add_referral_code(
+    code: ReferralCodeBase,
     session: AsyncSession = Depends(db_helper.session_dependency),
-    code: ReferralCodeBase = Depends(),
 ) -> ReferralCodeId:
     code_id = await RefCodeRepository.add_code(
         session=session,

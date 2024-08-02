@@ -6,6 +6,7 @@ from db.schemas import ReferralCodeBase, ReferralCodeUpdatePartial
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import selectinload, joinedload
 
+
 class RefCodeRepository:
     def generate_referral_code():
         import uuid
@@ -42,7 +43,9 @@ class RefCodeRepository:
 
     @classmethod
     async def get_code(cls, session: AsyncSession, code_id: int) -> ReferallCode:
-        return await session.get(ReferallCode, code_id, options=[joinedload(ReferallCode.user)])
+        return await session.get(
+            ReferallCode, code_id, options=[joinedload(ReferallCode.user)]
+        )
 
     @classmethod
     async def update_code(
@@ -92,6 +95,7 @@ class RefCodeRepository:
         result = await session.execute(query)
         code_model = result.scalars().first()
         return code_model
+
     @classmethod
     async def get_user_id_by_refcode(cls, session: AsyncSession, code: str) -> int:
         query = select(ReferallCode).where(ReferallCode.code == code)

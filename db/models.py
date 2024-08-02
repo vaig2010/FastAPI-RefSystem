@@ -35,6 +35,8 @@ class ReferallCode(Base):
     user_id: Mapped[int] = mapped_column(
         ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False
     )
-    user: Mapped["User"] = relationship(
-        "User", back_populates="referral_code"
-    )
+    user: Mapped["User"] = relationship("User", back_populates="referral_code")
+
+    def __str__(self):
+        string = f"code: {self.code}, created_date: {self.created_date}, expiration_date: {self.expiration_date}, user_id: {self.user_id}"
+        return string
