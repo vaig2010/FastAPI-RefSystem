@@ -19,7 +19,7 @@ class ReferralCodeBase(BaseModel):
 
 class ReferralCode(ReferralCodeBase):
     id: int
-    user: "UserRead"
+    #user: "UserRead"
     model_config = ConfigDict(from_attributes=True)
 
 
@@ -29,10 +29,10 @@ class ReferralCodeId(BaseModel):
 
 
 class ReferralCodeUpdatePartial(BaseModel):
-    code: str | None = None
+    code: Optional[str] = None
     created_date: datetime | None = None
     expiration_date: datetime | None = None
-    user_id: int | None = None
+    user_id: Optional[int] = None
 
 
 class UserRead(schemas.BaseUser[int]):
