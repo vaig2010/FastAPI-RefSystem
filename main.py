@@ -1,16 +1,23 @@
-from datetime import timedelta
 from fastapi import FastAPI
 from contextlib import asynccontextmanager
-from db.db_helper import db_helper
 from referral_codes.router import router as refcodes_router
 from users.router import router as users_router
 from referrals.router import router as referrals_router
 from auth.auth import auth_backend
 from db.schemas import UserRead, UserCreate, UserUpdate, ReferralCodeBase
 from auth.fastapi_users import fastapi_users
+from redis import asyncio as aioredis
+
+from fastapi_cache import FastAPICache
+from fastapi_cache.backends.redis import RedisBackend
+from fastapi_cache.decorator import cache
+
+
 # TODO: add tests
 @asynccontextmanager
-async def lifespan(app: FastAPI):
+async def lifespan(_: FastAPI):
+    redis = aioredis.from_url("redis://localhost")
+    FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
     yield
 
 

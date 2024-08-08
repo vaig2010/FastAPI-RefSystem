@@ -8,12 +8,12 @@ from db.db_helper import db_helper
 from sqlalchemy.ext.asyncio import AsyncSession
 from referral_codes.repository import RefCodeRepository
 
-SECRET = "SECRET"  # TODO: Change and move to config
+SECRET = "SECRET"  # if needed. Change and move to config
 
 
 class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
-    reset_password_token_secret = SECRET
-    verification_token_secret = SECRET
+    reset_password_token_secret = SECRET  # if needed
+    verification_token_secret = SECRET  # if needed
 
     async def on_after_register(self, user: User, request: Optional[Request] = None):
         print(f"User {user.id} has registered.")

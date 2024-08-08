@@ -11,6 +11,8 @@ from db.schemas import (
 from sqlalchemy.ext.asyncio import AsyncSession
 from .dependencies import refcode_by_id
 from pydantic import EmailStr
+from fastapi_cache.decorator import cache
+
 
 router = APIRouter(prefix="/refcodes", tags=["Referral Codes"])
 
@@ -28,6 +30,7 @@ async def add_referral_code(
 
 
 @router.get("/")
+@cache(expire=60)
 async def get_all_codes(
     session: AsyncSession = Depends(db_helper.session_dependency),
 ) -> list[ReferralCode]:
