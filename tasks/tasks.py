@@ -1,9 +1,22 @@
 from celery import Celery
+from core.config import settings
 
-celery = Celery('tasks', broker='redis://redis:6379')
+
+celery = Celery('tasks', broker=settings.redis_url, backend=settings.redis_url)
 
 # Just a template for celery tasks. Maybe in the future
 
 @celery.task
-def add(x, y):
-    return x + y
+def generate_referral_code():
+    import uuid
+    import hashlib
+
+    # Generate a random UUID
+    random_uuid = uuid.uuid4()
+
+    # Create a SHA-256 hash of the UUID
+    sha256_hash = hashlib.sha256(random_uuid.bytes).hexdigest()
+
+    # Take the first 8 characters of the hash as the referral code
+    referral_code = sha256_hash[:8].upper()
+    return referral_code

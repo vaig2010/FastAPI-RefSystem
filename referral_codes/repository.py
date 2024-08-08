@@ -1,31 +1,17 @@
 from datetime import datetime, timedelta
 from sqlalchemy import select, delete
-from db.models import User, ReferallCode
+from db.models import User, ReferralCode
 from sqlalchemy.ext.asyncio import AsyncSession
 from db.schemas import ReferralCodeBase, ReferralCodeUpdatePartial
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import selectinload, joinedload
-
+from tasks.tasks import generate_referral_code
 
 class RefCodeRepository:
-    def generate_referral_code():
-        import uuid
-        import hashlib
-
-        # Generate a random UUID
-        random_uuid = uuid.uuid4()
-
-        # Create a SHA-256 hash of the UUID
-        sha256_hash = hashlib.sha256(random_uuid.bytes).hexdigest()
-
-        # Take the first 8 characters of the hash as the referral code
-        referral_code = sha256_hash[:8].upper()
-        return referral_code
-
     @classmethod
     async def add_code(cls, session: AsyncSession, code: ReferralCodeBase) -> int:
         code_dict = code.model_dump()
-        code = ReferallCode(**code_dict)
+        code = ReferralCode(**code_dict)
         session.add(code)
         await session.commit()
         return code.id
@@ -34,45 +20,46 @@ class RefCodeRepository:
     async def get_codes(
         cls,
         session: AsyncSession,
-    ) -> list[ReferallCode]:
-        query = select(ReferallCode).options(selectinload(ReferallCode.user))
+    ) -> list[ReferralCode]:
+        query = select(ReferralCode).options(selectinload(ReferralCode.user))
         result = await session.execute(query)
         code_models = result.scalars().all()
         # code_schemas = [ReferralCode.model_validate(model) for model in code_models]
         return list(code_models)
 
     @classmethod
-    async def get_code(cls, session: AsyncSession, code_id: int) -> ReferallCode:
+    async def get_code(cls, session: AsyncSession, code_id: int) -> ReferralCode:
         return await session.get(
-            ReferallCode, code_id, options=[joinedload(ReferallCode.user)]
+            ReferralCode, code_id, options=[joinedload(ReferralCode.user)]
         )
 
     @classmethod
     async def update_code(
         cls,
         session: AsyncSession,
-        code: ReferallCode,
+        code: ReferralCode,
         code_update: ReferralCodeBase | ReferralCodeUpdatePartial,
         partial: bool = False,
-    ) -> ReferallCode:
+    ) -> ReferralCode:
         for name, value in code_update.model_dump(exclude_unset=partial).items():
             setattr(code, name, value)
         await session.commit()
         return code
 
     @classmethod
-    async def delete_code(cls, session: AsyncSession, code: ReferallCode) -> None:
+    async def delete_code(cls, session: AsyncSession, code: ReferralCode) -> None:
         await session.delete(code)
         await session.commit()
 
     @classmethod
     async def create_user_refcode(
         cls, session: AsyncSession, user_id: int, validity_days: int
-    ) -> ReferallCode:
+    ) -> ReferralCode:
         created_date = datetime.now()
         expiration_date = created_date + timedelta(days=validity_days)
-        code = ReferallCode(
-            code=cls.generate_referral_code(),
+        result_code = generate_referral_code.delay()
+        code = ReferralCode(
+            code=result_code.get(),
             created_date=created_date,
             expiration_date=expiration_date,
             user_id=user_id,
@@ -86,10 +73,10 @@ class RefCodeRepository:
         return code
 
     @classmethod
-    async def get_code_by_email(cls, session: AsyncSession, email: str) -> ReferallCode:
+    async def get_code_by_email(cls, session: AsyncSession, email: str) -> ReferralCode:
         query = (
-            select(ReferallCode)
-            .join(User, User.id == ReferallCode.user_id)
+            select(ReferralCode)
+            .join(User, User.id == ReferralCode.user_id)
             .filter(User.email == email)
         )
         result = await session.execute(query)
@@ -98,9 +85,9 @@ class RefCodeRepository:
 
     @classmethod
     async def get_user_id_by_refcode(cls, session: AsyncSession, code: str) -> int:
-        query = select(ReferallCode).where(ReferallCode.code == code)
+        query = select(ReferralCode).where(ReferralCode.code == code)
         result = await session.execute(query)
-        ref_code: ReferallCode = result.scalars().first()
+        ref_code: ReferralCode = result.scalars().first()
         if ref_code is None:
             raise ValueError("Referral code not found")
         elif ref_code.expiration_date < datetime.now():
