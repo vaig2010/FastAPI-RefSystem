@@ -5,7 +5,6 @@ from fastapi_users import exceptions, models, schemas
 from db.db_helper import get_user_db
 from db.models import User
 from db.db_helper import db_helper
-from sqlalchemy.ext.asyncio import AsyncSession
 from referral_codes.repository import RefCodeRepository
 
 SECRET = "SECRET"  # if needed. Change and move to config

@@ -11,12 +11,12 @@ from redis import asyncio as aioredis
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from fastapi_cache.decorator import cache
-
+from core.config import settings
 
 # TODO: add tests
 @asynccontextmanager
 async def lifespan(_: FastAPI):
-    redis = aioredis.from_url("redis://localhost")
+    redis = aioredis.from_url(settings.redis_url)
     FastAPICache.init(RedisBackend(redis), prefix="fastapi-cache")
     yield
 
@@ -54,5 +54,4 @@ def get_all_urls():
 
 if __name__ == "__main__":
     import uvicorn
-
     uvicorn.run("main:app", reload=True)
