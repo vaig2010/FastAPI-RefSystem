@@ -15,7 +15,7 @@ async def get_user_refcode(
     session: AsyncSession = Depends(db_helper.session_dependency),
     user: UserRead = Depends(current_user),
 ) -> ReferralCode:
-    code = await UserRepository.get_user_refcode(session=session, user_id=user.id)
+    code = await UserRepository.get_user_refcode(session=session, user=user)
     if not code:
         raise HTTPException(status_code=404, detail="Referral code not found")
     return code
@@ -26,9 +26,11 @@ async def create_user_refcode(
     session: AsyncSession = Depends(db_helper.session_dependency),
     user: User = Depends(current_user),
 ) -> dict:
+    if user.refcode_id is not None:
+        raise HTTPException(status_code=400, detail="Referral code already exists")
     try:
         code = await RefCodeRepository.create_user_refcode(
-            user_id=user.id, validity_days=30, session=session
+            validity_days=30, session=session
         )
         user = await UserRepository.update_users_code_id(
             session=session, user=user, refcode=code
@@ -44,5 +46,5 @@ async def delete_user_refcode(
     session: AsyncSession = Depends(db_helper.session_dependency),
     user: User = Depends(current_user),
 ) -> None:
-    code = await UserRepository.get_user_refcode(session=session, user_id=user.id)
+    code = await UserRepository.get_user_refcode(session=session, user=user)
     await RefCodeRepository.delete_code(session=session, code=code)

@@ -2,9 +2,8 @@ from celery import Celery
 from core.config import settings
 
 
-celery = Celery('tasks', broker=settings.redis_url, backend=settings.redis_url)
+celery = Celery("tasks", broker=settings.redis_url, backend=settings.redis_url)
 
-# Just a template for celery tasks. Maybe in the future
 
 @celery.task
 def generate_referral_code():

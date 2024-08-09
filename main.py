@@ -13,6 +13,7 @@ from fastapi_cache.backends.redis import RedisBackend
 from fastapi_cache.decorator import cache
 from core.config import settings
 
+
 # TODO: add tests
 @asynccontextmanager
 async def lifespan(_: FastAPI):
@@ -38,7 +39,6 @@ app.include_router(
     prefix="/auth",
     tags=["Auth"],
 )
-# TODO: add referrer extended info
 app.include_router(
     fastapi_users.get_users_router(UserRead, UserUpdate),
     prefix="/users",
@@ -54,4 +54,5 @@ def get_all_urls():
 
 if __name__ == "__main__":
     import uvicorn
+
     uvicorn.run("main:app", reload=True)

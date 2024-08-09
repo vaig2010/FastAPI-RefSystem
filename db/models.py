@@ -26,7 +26,9 @@ class User(SQLAlchemyBaseUserTable[int], Base):
     is_active: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
     is_superuser: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
     is_verified: Mapped[bool] = mapped_column(Boolean, default=False, nullable=False)
-    code_id: Mapped[int] = mapped_column(nullable=True, default=None, index=True)
+    refcode_id: Mapped[int] = mapped_column(
+        ForeignKey("referral_codes.id", ondelete="CASCADE"), unique=True, nullable=True
+    )
     referrer_id: Mapped[int] = mapped_column(
         Integer, ForeignKey("users.id"), nullable=True
     )
@@ -40,7 +42,4 @@ class ReferralCode(Base):
     code: Mapped[str] = mapped_column(unique=True)
     created_date: Mapped[datetime]
     expiration_date: Mapped[datetime]
-    user_id: Mapped[int] = mapped_column(
-        ForeignKey("users.id", ondelete="CASCADE"), unique=True, nullable=False
-    )
     user: Mapped["User"] = relationship("User", back_populates="referral_code")

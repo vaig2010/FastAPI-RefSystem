@@ -14,7 +14,6 @@ class ReferralCodeBase(BaseModel):
     expiration_date: datetime = Field(
         default_factory=settings.time_func.datetime_expiration
     )
-    user_id: int
 
 
 class ReferralCode(ReferralCodeBase):
@@ -41,9 +40,9 @@ class UserRead(schemas.BaseUser[int]):
     is_active: bool = True
     is_superuser: bool = False
     is_verified: bool = False
-    code_id: Optional[int] = None
+    refcode_id: Optional[int] = None
     referrer_id: Optional[int] = None
-    # referral_code: Optional[ReferralCode] = None
+    referral_code: Optional[ReferralCode] = None
 
 
 class UserCreate(schemas.BaseUserCreate):
@@ -52,9 +51,9 @@ class UserCreate(schemas.BaseUserCreate):
     is_active: Optional[bool] = True
     is_superuser: Optional[bool] = False
     is_verified: Optional[bool] = False
-    code_id: Optional[int] = None
+    refcode_id: Optional[int] = None
     referrer_id: Optional[int] = None
-    referral_code: Optional[str] = None
+    code: Optional[str] = None
 
 
 class UserUpdate(schemas.BaseUserUpdate):
@@ -63,5 +62,5 @@ class UserUpdate(schemas.BaseUserUpdate):
     is_active: Optional[bool] = True
     is_superuser: Optional[bool] = False
     is_verified: Optional[bool] = False
-    code_id: Optional[int] = None
+    refcode_id: Optional[int] = None
     referrer_id: Optional[int] = None

@@ -26,6 +26,7 @@ class Setting(BaseSettings):
     db_url: str = "sqlite+aiosqlite:///ref_codes.db"
     db_echo: bool = False
     # db_echo: bool = True
+    debug: bool = True
     auth_jwt: AuthJWTSettings = AuthJWTSettings()
     time_func: TimeSettings = TimeSettings()
     redis_url: str = 'redis://localhost'

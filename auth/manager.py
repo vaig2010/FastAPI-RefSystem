@@ -6,6 +6,7 @@ from db.db_helper import get_user_db
 from db.models import User
 from db.db_helper import db_helper
 from referral_codes.repository import RefCodeRepository
+from users.repository import UserRepository
 
 SECRET = "SECRET"  # if needed. Change and move to config
 
@@ -17,6 +18,15 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
     async def on_after_register(self, user: User, request: Optional[Request] = None):
         print(f"User {user.id} has registered.")
 
+    async def get(self, id: models.ID) -> models.UP:
+        session = db_helper.get_scoped_session()
+        user = await UserRepository.get_user(session=session, user_id=id)
+        await session.remove()
+
+        if user is None:
+            raise exceptions.UserNotExists()
+
+        return user
     async def create(
         self,
         user_create: schemas.UC,
@@ -35,16 +45,17 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
             else user_create.create_update_dict_superuser()
         )
         password = user_dict.pop("password")
-        if "referral_code" in user_dict:
-            referral_code = user_dict.pop("referral_code")
+        if "code" in user_dict:
+            referral_code = user_dict.pop("code")
             try:
                 session = db_helper.get_scoped_session()
                 referrer_id = await RefCodeRepository.get_user_id_by_refcode(
                     session=session, code=referral_code
                 )
                 user_dict["referrer_id"] = referrer_id
-                await session.aclose()
+                await session.remove()
             except ValueError as e:
+                await session.remove()
                 raise HTTPException(status_code=400, detail=str(e))
         user_dict["hashed_password"] = self.password_helper.hash(password)
 

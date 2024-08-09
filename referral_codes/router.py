@@ -30,7 +30,6 @@ async def add_referral_code(
 
 
 @router.get("/")
-@cache(expire=60)
 async def get_all_codes(
     session: AsyncSession = Depends(db_helper.session_dependency),
 ) -> list[ReferralCode]:
