@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select
+from sqlalchemy.orm import selectinload
 
 from models.db_helper import db_helper
 from models.models import User
@@ -14,7 +15,11 @@ router = APIRouter(prefix="/referrals", tags=["Referrals"])
 async def get_referrals(
     referrer_id: int, session: AsyncSession = Depends(db_helper.session_dependency)
 ) -> list[UserRead]:
-    result = await session.execute(select(User).where(User.referrer_id == referrer_id))
+    result = await session.execute(
+        select(User)
+        .where(User.referrer_id == referrer_id)
+        .options(selectinload(User.referral_code))
+    )
     referrals = result.scalars().all()
     if not referrals:
         raise HTTPException(
