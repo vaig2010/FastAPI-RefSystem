@@ -36,11 +36,12 @@ class RefCodeRepository:
 
     @classmethod
     async def get_code_by_id(cls, session: AsyncSession, code_id: int) -> ReferralCode:
-        return await session.get(
-            ReferralCode, code_id, options=[joinedload(ReferralCode.user)]
-        )
+        return await session.get(ReferralCode, code_id)
+
     @classmethod
-    async def check_if_code_exist(cls, session: AsyncSession, code: ReferralCode) -> bool:
+    async def check_if_code_exists(
+        cls, session: AsyncSession, code: ReferralCode
+    ) -> bool:
         query = select(ReferralCode).where(code.code == ReferralCode.code)
         result = await session.execute(query)
         code_model = result.scalar_one_or_none()
@@ -77,12 +78,15 @@ class RefCodeRepository:
     async def create_user_refcode(
         cls, session: AsyncSession, validity_days: int
     ) -> ReferralCode:
+        
         created_date = datetime.now()
         expiration_date = created_date + timedelta(days=validity_days)
+        # change this on deploy
         if settings.debug:
             result_code = generate_referral_code()
         else:
             result_code = generate_referral_code.delay().get()
+        
         code = ReferralCode(
             code=result_code, created_date=created_date, expiration_date=expiration_date
         )

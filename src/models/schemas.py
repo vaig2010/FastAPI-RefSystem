@@ -40,7 +40,7 @@ class UserRead(schemas.BaseUser[int]):
     is_active: bool = True
     is_superuser: bool = False
     is_verified: bool = False
-    refcode_id: Optional[int] = None
+    # refcode_id: Optional[int] = None
     referrer_id: Optional[int] = None
     referral_code: Optional[ReferralCode] = None
 
@@ -51,7 +51,7 @@ class UserCreate(schemas.BaseUserCreate):
     is_active: Optional[bool] = True
     is_superuser: Optional[bool] = False
     is_verified: Optional[bool] = False
-    refcode_id: Optional[int] = None
+    # refcode_id: Optional[int] = None
     referrer_id: Optional[int] = None
     code: Optional[str] = None
 
@@ -62,5 +62,5 @@ class UserUpdate(schemas.BaseUserUpdate):
     is_active: Optional[bool] = True
     is_superuser: Optional[bool] = False
     is_verified: Optional[bool] = False
-    refcode_id: Optional[int] = None
+    # refcode_id: Optional[int] = None
     referrer_id: Optional[int] = None

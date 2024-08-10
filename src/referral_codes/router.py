@@ -23,7 +23,7 @@ async def add_referral_code(
     code: ReferralCodeBase,
     session: AsyncSession = Depends(db_helper.session_dependency),
 ) -> ReferralCode:
-    if await RefCodeRepository.check_if_code_exist(session=session, code=code):
+    if await RefCodeRepository.check_if_code_exists(session=session, code=code):
         raise HTTPException(status_code=400, detail="Code already exists!")
     code = await RefCodeRepository.add_code(
         session=session,
