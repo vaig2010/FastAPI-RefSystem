@@ -1,10 +1,8 @@
 from typing import Annotated
-
 from fastapi import Path, Depends, HTTPException, status
 from sqlalchemy.ext.asyncio import AsyncSession
-
-from db.db_helper import db_helper
-from db.models import ReferralCode
+from models.db_helper import db_helper
+from models.models import ReferralCode
 from referral_codes.repository import RefCodeRepository
 
 

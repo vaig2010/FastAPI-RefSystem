@@ -3,9 +3,9 @@ from contextlib import asynccontextmanager
 from referral_codes.router import router as refcodes_router
 from users.router import router as users_router
 from referrals.router import router as referrals_router
-from auth.auth import auth_backend
-from db.schemas import UserRead, UserCreate, UserUpdate, ReferralCodeBase
-from auth.fastapi_users import fastapi_users
+from security.auth import auth_backend
+from models.schemas import UserRead, UserCreate, UserUpdate, ReferralCodeBase
+from security.fastapi_users import fastapi_users
 from redis import asyncio as aioredis
 
 from fastapi_cache import FastAPICache
@@ -54,5 +54,5 @@ def get_all_urls():
 
 if __name__ == "__main__":
     import uvicorn
-
+    
     uvicorn.run("main:app", reload=True)

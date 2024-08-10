@@ -1,17 +1,18 @@
-from typing import Annotated
-from fastapi import APIRouter, Depends, Path, HTTPException
-from db.db_helper import db_helper
-from referral_codes.repository import RefCodeRepository
-from db.schemas import (
+from models.schemas import (
     ReferralCode,
     ReferralCodeBase,
     ReferralCodeId,
     ReferralCodeUpdatePartial,
 )
-from sqlalchemy.ext.asyncio import AsyncSession
-from .dependencies import refcode_by_id
+from typing import Annotated
 from pydantic import EmailStr
 from fastapi_cache.decorator import cache
+from sqlalchemy.ext.asyncio import AsyncSession
+from fastapi import APIRouter, Depends, Path, HTTPException
+
+from models.db_helper import db_helper
+from referral_codes.repository import RefCodeRepository
+from .dependencies import refcode_by_id
 
 
 router = APIRouter(prefix="/refcodes", tags=["Referral Codes"])

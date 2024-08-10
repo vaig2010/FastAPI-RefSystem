@@ -3,7 +3,7 @@ from pathlib import Path
 from pydantic import BaseModel
 from pydantic_settings import BaseSettings
 
-BASE_DIR = Path(__file__).parent.parent
+BASE_DIR = Path(__file__).parent.parent.parent
 
 
 class AuthJWTSettings(BaseModel):
@@ -13,13 +13,14 @@ class AuthJWTSettings(BaseModel):
 
 class TimeSettings(BaseModel):
     @classmethod
-    def datetime_now(self):
+    def get_current_datetime(cls) -> datetime:
         return datetime.now(timezone.utc)
-    @classmethod
-    def datetime_expiration(self):
-        return self.datetime_now() + timedelta(days=30)
-    time_now = datetime_now
-    time_exp = datetime_expiration
+    def get_expiration_datetime(cls) -> datetime:
+        return cls.get_current_datetime() + timedelta(days=30)
+    
+    
+    datetime_now = get_current_datetime
+    datetime_expiration = get_expiration_datetime
     
 
 class Setting(BaseSettings):

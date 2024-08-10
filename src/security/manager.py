@@ -2,9 +2,10 @@ from typing import Optional
 from fastapi import Depends, HTTPException, Request
 from fastapi_users import BaseUserManager, IntegerIDMixin
 from fastapi_users import exceptions, models, schemas
-from db.db_helper import get_user_db
-from db.models import User
-from db.db_helper import db_helper
+
+from models.db_helper import get_user_db
+from models.models import User
+from models.db_helper import db_helper
 from referral_codes.repository import RefCodeRepository
 from users.repository import UserRepository
 
@@ -20,13 +21,14 @@ class UserManager(IntegerIDMixin, BaseUserManager[User, int]):
 
     async def get(self, id: models.ID) -> models.UP:
         session = db_helper.get_scoped_session()
-        user = await UserRepository.get_user(session=session, user_id=id)
+        user = await UserRepository.get_user_by_id(session=session, user_id=id)
         await session.remove()
 
         if user is None:
             raise exceptions.UserNotExists()
 
         return user
+
     async def create(
         self,
         user_create: schemas.UC,

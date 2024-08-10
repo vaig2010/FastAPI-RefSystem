@@ -4,7 +4,7 @@ from core.config import settings
 
 celery = Celery("tasks", broker=settings.redis_url, backend=settings.redis_url)
 
-
+# Not useful. Just for fun
 @celery.task
 def generate_referral_code():
     import uuid

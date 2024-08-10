@@ -1,9 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
-from db.db_helper import db_helper
-from db.models import User
-from db.schemas import UserRead
 from sqlalchemy.ext.asyncio import AsyncSession
+from sqlalchemy import select
+
+from models.db_helper import db_helper
+from models.models import User
+from models.schemas import UserRead
+
 
 router = APIRouter(prefix="/referrals", tags=["Referrals"])
 
