@@ -8,7 +8,7 @@ from tasks.tasks import generate_referral_code
 from core.config import settings
 from models.models import User, ReferralCode
 import models.schemas as schemas
-from users.repository import UserRepository
+
 
 class RefCodeRepository:
     @classmethod
@@ -19,7 +19,7 @@ class RefCodeRepository:
         code = ReferralCode(**code_dict)
         session.add(code)
         await session.commit()
-        return code.id
+        return code
 
     @classmethod
     async def get_codes(
@@ -35,10 +35,16 @@ class RefCodeRepository:
         return list(code_schemas)
 
     @classmethod
-    async def get_code(cls, session: AsyncSession, code_id: int) -> ReferralCode:
+    async def get_code_by_id(cls, session: AsyncSession, code_id: int) -> ReferralCode:
         return await session.get(
             ReferralCode, code_id, options=[joinedload(ReferralCode.user)]
         )
+    @classmethod
+    async def check_if_code_exist(cls, session: AsyncSession, code: ReferralCode) -> bool:
+        query = select(ReferralCode).where(code.code == ReferralCode.code)
+        result = await session.execute(query)
+        code_model = result.scalar_one_or_none()
+        return code_model is not None
 
     @classmethod
     async def update_code(
@@ -57,14 +63,15 @@ class RefCodeRepository:
     async def delete_code(cls, session: AsyncSession, code: ReferralCode) -> None:
         await session.delete(code)
         await session.commit()
-        
+
     @classmethod
-    async def get_refcode_by_user(cls, session: AsyncSession, user: User) -> ReferralCode:
+    async def get_refcode_by_user(
+        cls, session: AsyncSession, user: User
+    ) -> ReferralCode:
         query = select(ReferralCode).where(user.refcode_id == ReferralCode.id)
         result = await session.execute(query)
         code_model = result.scalars().first()
         return code_model
-
 
     @classmethod
     async def create_user_refcode(

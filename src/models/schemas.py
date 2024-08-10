@@ -8,10 +8,10 @@ from core.config import settings
 
 class ReferralCodeBase(BaseModel):
     code: str
-    created_date: datetime = Field(
+    created_date: Optional[datetime] = Field(
         default_factory=settings.time_func.datetime_now
         )
-    expiration_date: datetime = Field(
+    expiration_date: Optional[datetime] = Field(
         default_factory=settings.time_func.datetime_expiration
     )
 

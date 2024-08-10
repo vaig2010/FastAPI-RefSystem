@@ -18,17 +18,18 @@ from .dependencies import refcode_by_id
 router = APIRouter(prefix="/refcodes", tags=["Referral Codes"])
 
 
-@router.post("/")
+@router.post("/", status_code=201)
 async def add_referral_code(
     code: ReferralCodeBase,
     session: AsyncSession = Depends(db_helper.session_dependency),
-) -> ReferralCodeId:
-    code_id = await RefCodeRepository.add_code(
+) -> ReferralCode:
+    if await RefCodeRepository.check_if_code_exist(session=session, code=code):
+        raise HTTPException(status_code=400, detail="Code already exists!")
+    code = await RefCodeRepository.add_code(
         session=session,
         code=code,
     )
-    return {"ok": True, "code_id": code_id}
-
+    return code
 
 @router.get("/")
 async def get_all_codes(
@@ -83,11 +84,11 @@ async def delete_code_by_id(
 async def get_code_by_email(
     session: AsyncSession = Depends(db_helper.session_dependency),
     email: str | Annotated[EmailStr, Path()] = "user@example.com",
-):
+) -> ReferralCode:
 
     code_model = await RefCodeRepository.get_code_by_email(session=session, email=email)
     if not code_model:
         raise HTTPException(
             status_code=404, detail="Referral code not found for this email"
         )
-    return {"refcode": code_model}
+    return code_model

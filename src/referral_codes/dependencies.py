@@ -10,7 +10,7 @@ async def refcode_by_id(
     code_id: Annotated[int, Path],
     session: AsyncSession = Depends(db_helper.session_dependency),
 ) -> ReferralCode:
-    code = await RefCodeRepository.get_code(session=session, code_id=code_id)
+    code = await RefCodeRepository.get_code_by_id(session=session, code_id=code_id)
     if code is not None:
         return code
 
