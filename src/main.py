@@ -13,7 +13,6 @@ from fastapi_cache.backends.redis import RedisBackend
 from fastapi_cache.decorator import cache
 from core.config import settings
 
-# TODO: add management. Create add_sample_data
 # TODO: add tests
 @asynccontextmanager
 async def lifespan(_: FastAPI):

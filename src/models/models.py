@@ -2,6 +2,7 @@ from fastapi_users.db import SQLAlchemyBaseUserTable
 from sqlalchemy import Boolean, ForeignKey, Integer, String
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column, relationship
 from datetime import datetime
+from core.config import settings
 
 """
 Note that the ORM’s “delete” and “delete-orphan” behavior applies only to the use of the Session.delete()
@@ -30,7 +31,7 @@ class User(SQLAlchemyBaseUserTable[int], Base):
         ForeignKey("referral_codes.id", ondelete="CASCADE"), unique=True, nullable=True
     )
     referrer_id: Mapped[int] = mapped_column(
-        Integer, ForeignKey("users.id"), nullable=True
+        Integer, ForeignKey("users.id"), nullable=True, unique=True
     )
     referral_code: Mapped["ReferralCode"] = relationship(
         "ReferralCode", back_populates="user", uselist=False, cascade="all, delete"
@@ -39,7 +40,11 @@ class User(SQLAlchemyBaseUserTable[int], Base):
 
 class ReferralCode(Base):
     __tablename__ = "referral_codes"
-    code: Mapped[str] = mapped_column(unique=True)
-    created_date: Mapped[datetime]
-    expiration_date: Mapped[datetime]
+    code: Mapped[str] = mapped_column(unique=True, index=True)
+    created_date: Mapped[datetime] = mapped_column(
+        default=settings.time_func.get_current_datetime(), nullable=False
+    )
+    expiration_date: Mapped[datetime] = mapped_column(
+        default=settings.time_func.get_expiration_datetime(), nullable=False
+    )
     user: Mapped["User"] = relationship("User", back_populates="referral_code")
