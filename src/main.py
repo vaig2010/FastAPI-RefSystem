@@ -6,12 +6,13 @@ from referrals.router import router as referrals_router
 from security.auth import auth_backend
 from models.schemas import UserRead, UserCreate, UserUpdate, ReferralCodeBase
 from security.fastapi_users import fastapi_users
-from redis import asyncio as aioredis
+from core.config import settings
 
+from redis import asyncio as aioredis
 from fastapi_cache import FastAPICache
 from fastapi_cache.backends.redis import RedisBackend
 from fastapi_cache.decorator import cache
-from core.config import settings
+
 
 # TODO: add tests
 @asynccontextmanager
